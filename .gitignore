@@ -1,0 +1,30 @@
+# macOS specific files
+.DS_Store
+
+# IntelliJ IDEA project files
+.idea/
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Exclude all log files
+*.log
+
+# Node.js specific files
+node_modules/
+
+# Python specific files
+__pycache__/
+*.py[cod]
+
+# General backup files
+*.swp
+*.swo
+*~
+
+# Other system files
+Thumbs.db
+*.bak
+*.old
+
