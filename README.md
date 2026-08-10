@@ -62,19 +62,24 @@ teams/team1/  →  init → plan → PR review → apply    (independent)
 teams/team2/  →  init → plan → PR review → apply    (independent)
 ```
 
-### Backend configuration
+### Backend configuration (required before shared / CI usage)
 
-Edit `backend.tf` in each team folder to point to a unique state path:
+This is a **reference demo**. Out of the box, state is local — fine for a solo lab, **not OK for team/CI**.
+
+Before any shared usage, edit `backend.tf` in each team folder: uncomment **one** backend and set real values. Prefer **Artifactory** (state in a Generic repo on the same platform). S3 / GCS are alternatives if you already have cloud storage.
 
 ```hcl
+# Recommended — Artifactory Generic repo
 terraform {
-  backend "s3" {
-    bucket = "my-terraform-state"
-    key    = "jfrog-projects/team1/terraform.tfstate"
-    ...
+  backend "artifactory" {
+    url     = "https://your-instance.jfrog.io/artifactory"
+    repo    = "terraform-state"
+    subpath = "jfrog-projects/team1"   # unique per team
   }
 }
 ```
+
+Each team must keep a **unique** `subpath` / `key` so states never collide.
 
 ## Prerequisites
 
