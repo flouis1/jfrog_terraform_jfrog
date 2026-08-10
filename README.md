@@ -2,26 +2,24 @@
 
 Demonstrates the **one project per team** pattern on JFrog Platform using Terraform.
 
-Teams are declared in a single `teams.yaml` file. Terraform loops over all entries — no code changes needed to onboard a new team.
+Each team has its own Terraform state — isolated blast radius, no cross-team locking conflicts.
 
 ## Repository structure
 
 ```
 .
-├── main.tf                 # for_each over teams.yaml → instantiates module
-├── teams.yaml              # ALL teams defined here (add/remove teams, that's it)
-├── variables.tf            # jfrog_url
-├── providers.tf
-├── versions.tf
-├── outputs.tf
-├── terraform.tfvars.example
-└── modules/
-    └── team_project/       # Reusable module: project + repos + group assignments
+├── modules/
+│   └── team_project/           # Reusable module: project + repos + group assignments
+└── teams/
+    ├── _template/              # Copy this folder to onboard a new team
+    ├── team1/                  # Team 1 — own state, own apply
+    └── team2/                  # Team 2 — own state, own apply
 ```
 
 ## Quick start
 
 ```bash
+cd teams/team1
 cp terraform.tfvars.example terraform.tfvars
 # Edit terraform.tfvars — set your JFrog Platform URL
 
@@ -33,44 +31,31 @@ terraform apply
 
 ## Adding a new team
 
-Just add an entry in `teams.yaml`:
-
-```yaml
-- project_key: charlie
-  display_name: "Team Charlie"
-  description: "Data engineering team"
-  admin_groups:
-    - charlie-leads
-  member_groups:
-    - charlie-devs
-  repositories:
-    - key: charlie-docker-dev-local
-      type: local
-      package_type: docker
-      description: "Docker images — development"
-      environments: ["DEV"]
-    - key: charlie-docker-prod-local
-      type: local
-      package_type: docker
-      description: "Docker images — production"
-      environments: ["PROD"]
-    - key: charlie-docker-remote
-      type: remote
-      package_type: docker
-      description: "Proxy to Docker Hub"
-      url: "https://registry-1.docker.io/"
-      environments: ["DEV", "PROD"]
-    - key: charlie-docker-virtual
-      type: virtual
-      package_type: docker
-      description: "Single endpoint for all Docker repos"
-      members:
-        - charlie-docker-dev-local
-        - charlie-docker-prod-local
-        - charlie-docker-remote
+```bash
+cp -r teams/_template teams/my-new-team
 ```
 
-Then `terraform apply`. Done.
+Then edit `teams/my-new-team/main.tf` — set project key, display name, repos, and groups. Run `terraform init && terraform apply`.
+
+Each team is fully independent:
+- Own state file (no cross-team conflicts)
+- Own `terraform apply` (one team's failure doesn't block another)
+- Own backend config (state isolation)
+
+## State isolation
+
+Each `teams/<team>/` folder is a separate Terraform root module with its own state.
+Edit `backend.tf` in each team folder to point to a unique state path:
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket = "my-terraform-state"
+    key    = "jfrog-projects/team1/terraform.tfstate"
+    ...
+  }
+}
+```
 
 ## Prerequisites
 
