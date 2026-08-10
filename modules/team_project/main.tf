@@ -70,7 +70,7 @@ resource "artifactory_virtual_docker_repository" "docker" {
   ]
 
   lifecycle {
-    ignore_changes = [project_key]
+    ignore_changes = [project_key, repositories]
   }
 }
 
