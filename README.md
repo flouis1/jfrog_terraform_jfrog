@@ -42,9 +42,28 @@ Each team is fully independent:
 - Own `terraform apply` (one team's failure doesn't block another)
 - Own backend config (state isolation)
 
-## State isolation
+## Independent SDLC per team
 
-Each `teams/<team>/` folder is a separate Terraform root module with its own state.
+Each `teams/<team>/` folder is a **fully independent Terraform root module**. Teams don't share state, don't block each other, and can evolve at their own pace.
+
+| Aspect | Isolation |
+|--------|-----------|
+| State | Each team has its own `.tfstate` — no shared locking |
+| Plan | Team 1 can have Docker repos, Team 2 can have Maven + NuGet |
+| Apply | Teams apply independently — one failure doesn't block others |
+| Review | Each team's changes go through their own PR / approval flow |
+| Schedule | Team 1 can deploy daily, Team 2 weekly — no coordination needed |
+| Backend | Each team can store state in a different path/bucket |
+
+In CI, this means one pipeline per team folder:
+
+```
+teams/team1/  →  init → plan → PR review → apply    (independent)
+teams/team2/  →  init → plan → PR review → apply    (independent)
+```
+
+### Backend configuration
+
 Edit `backend.tf` in each team folder to point to a unique state path:
 
 ```hcl
