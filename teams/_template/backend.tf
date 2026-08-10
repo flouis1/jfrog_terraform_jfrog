@@ -1,17 +1,15 @@
 ## WARNING: local state by default.
-## Before any real/shared usage, uncomment ONE backend below and set real values.
-## Each team MUST use a unique state path (replace TEAM_KEY).
+## Before any shared / CI usage, uncomment ONE backend below and set real values.
+##
+## Do NOT store this state inside the JFrog Platform this code manages.
+## This stack configures Artifactory repositories, Projects and Xray policies —
+## keeping its state on that same platform creates a circular dependency:
+## a bad apply or a platform outage would lock you out of your own state.
+##
+## Note: the legacy `backend "artifactory"` block was removed in Terraform 1.3
+## and cannot be used here (required_version >= 1.5).
 
-## Recommended for JFrog platforms — store state in a Generic Artifactory repo
-# terraform {
-#   backend "artifactory" {
-#     url     = "https://your-instance.jfrog.io/artifactory"
-#     repo    = "terraform-state"
-#     subpath = "jfrog-projects/TEAM_KEY"
-#   }
-# }
-
-## Alternative: S3 (AWS / MinIO / compatible)
+## S3 (AWS / MinIO / compatible) — locking via DynamoDB
 # terraform {
 #   backend "s3" {
 #     bucket         = "my-terraform-state"
@@ -22,10 +20,20 @@
 #   }
 # }
 
-## Alternative: GCS
+## GCS — locking built in
 # terraform {
 #   backend "gcs" {
 #     bucket = "my-terraform-state"
 #     prefix = "jfrog-projects/TEAM_KEY"
+#   }
+# }
+
+## Azure Blob Storage — locking via blob lease
+# terraform {
+#   backend "azurerm" {
+#     resource_group_name  = "tfstate-rg"
+#     storage_account_name = "mytfstate"
+#     container_name       = "tfstate"
+#     key                  = "jfrog-projects/TEAM_KEY/terraform.tfstate"
 #   }
 # }

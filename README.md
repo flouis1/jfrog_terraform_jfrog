@@ -66,20 +66,25 @@ teams/team2/  →  init → plan → PR review → apply    (independent)
 
 This is a **reference demo**. Out of the box, state is local — fine for a solo lab, **not OK for team/CI**.
 
-Before any shared usage, edit `backend.tf` in each team folder: uncomment **one** backend and set real values. Prefer **Artifactory** (state in a Generic repo on the same platform). S3 / GCS are alternatives if you already have cloud storage.
+Before any shared usage, edit `backend.tf` in each team folder: uncomment **one** backend and set real values (S3, GCS, or azurerm).
 
 ```hcl
-# Recommended — Artifactory Generic repo
 terraform {
-  backend "artifactory" {
-    url     = "https://your-instance.jfrog.io/artifactory"
-    repo    = "terraform-state"
-    subpath = "jfrog-projects/team1"   # unique per team
+  backend "s3" {
+    bucket         = "my-terraform-state"
+    key            = "jfrog-projects/team1/terraform.tfstate"   # unique per team
+    region         = "eu-west-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
   }
 }
 ```
 
-Each team must keep a **unique** `subpath` / `key` so states never collide.
+Each team must keep a **unique** state path so states never collide.
+
+**Do not store this state inside the JFrog Platform this code manages.** This stack configures Artifactory repositories, Projects and Xray policies. Keeping its state on that same platform creates a circular dependency — a bad apply or a platform outage would lock you out of the state needed to fix it. Pick storage that stays available when the platform is down.
+
+The legacy `backend "artifactory"` block is not an option either: it was deprecated in Terraform 1.2.3 and **removed in 1.3**, so it cannot be used with `required_version >= 1.5`.
 
 ## Prerequisites
 
