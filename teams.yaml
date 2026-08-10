@@ -1,68 +1,68 @@
 ## One entry per team — add yours here, terraform will loop over all of them.
 ## No code changes needed to onboard a new team.
 
-- project_key: alpha
-  display_name: "Team Alpha"
-  description: "Frontend team"
+- project_key: team1
+  display_name: "Team 1"
+  description: "First team project"
   admin_groups:
-    - alpha-leads
+    - team1-leads
   member_groups:
-    - alpha-devs
+    - team1-devs
   repositories:
-    - key: alpha-docker-dev-local
+    - key: team1-docker-dev-local
       type: local
       package_type: docker
       description: "Docker images — development"
       environments: ["DEV"]
-    - key: alpha-docker-prod-local
+    - key: team1-docker-prod-local
       type: local
       package_type: docker
       description: "Docker images — production"
       environments: ["PROD"]
-    - key: alpha-docker-remote
+    - key: team1-docker-remote
       type: remote
       package_type: docker
       description: "Proxy to Docker Hub"
       url: "https://registry-1.docker.io/"
       environments: ["DEV", "PROD"]
-    - key: alpha-docker-virtual
+    - key: team1-docker-virtual
       type: virtual
       package_type: docker
       description: "Single endpoint for all Docker repos"
       members:
-        - alpha-docker-dev-local
-        - alpha-docker-prod-local
-        - alpha-docker-remote
+        - team1-docker-dev-local
+        - team1-docker-prod-local
+        - team1-docker-remote
 
-- project_key: bravo
-  display_name: "Team Bravo"
-  description: "Backend services team"
+- project_key: team2
+  display_name: "Team 2"
+  description: "Second team project"
   admin_groups:
-    - bravo-leads
+    - team2-leads
   member_groups:
-    - bravo-devs
+    - team2-devs
   repositories:
-    - key: bravo-docker-dev-local
+    - key: team2-docker-dev-local
       type: local
       package_type: docker
       description: "Docker images — development"
       environments: ["DEV"]
-    - key: bravo-docker-prod-local
+    - key: team2-docker-prod-local
       type: local
       package_type: docker
       description: "Docker images — production"
       environments: ["PROD"]
-    - key: bravo-docker-remote
+    - key: team2-docker-remote
       type: remote
       package_type: docker
       description: "Proxy to Docker Hub"
       url: "https://registry-1.docker.io/"
       environments: ["DEV", "PROD"]
-    - key: bravo-docker-virtual
+    - key: team2-docker-virtual
       type: virtual
       package_type: docker
       description: "Single endpoint for all Docker repos"
       members:
-        - bravo-docker-dev-local
-        - bravo-docker-prod-local
-        - bravo-docker-remote
+        - team2-docker-dev-local
+        - team2-docker-prod-local
+        - team2-docker-remote
