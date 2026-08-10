@@ -97,11 +97,11 @@ resource "artifactory_package_cleanup_policy" "audit_reports_retention" {
   skip_trashcan   = false
 
   search_criteria = {
-    package_types        = ["generic"]
-    repos                = [artifactory_local_generic_repository.audit_reports.key]
-    included_packages    = ["**"]
-    included_projects    = []
-    include_all_projects = true
+    package_types          = ["generic"]
+    repos                  = [artifactory_local_generic_repository.audit_reports.key]
+    included_packages      = ["**"]
+    included_projects      = []
+    include_all_projects   = true
     created_before_in_days = 730
   }
 }

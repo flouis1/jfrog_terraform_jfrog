@@ -38,22 +38,36 @@ variable "team_member_groups" {
 }
 
 variable "repositories" {
-  description = "Repositories to create and assign to the project"
+  description = "Repositories to create and assign to the project. Supported package_type: docker, generic only."
   type = list(object({
     key          = string
     type         = string # local, remote, virtual
-    package_type = string # docker, maven, nuget, npm, generic, etc.
+    package_type = string # docker | generic
     description  = string
     environments = optional(list(string), ["DEV"])
-    url          = optional(string, "")       # required for remote repos
+    url          = optional(string, "") # required for remote repos
     xray_index   = optional(bool, true)
     members      = optional(list(string), []) # virtual repo: list of repo keys to aggregate
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for r in var.repositories : contains(["docker", "generic"], r.package_type)
+    ])
+    error_message = "repositories[*].package_type must be one of: docker, generic."
+  }
+
+  validation {
+    condition = alltrue([
+      for r in var.repositories : contains(["local", "remote", "virtual"], r.type)
+    ])
+    error_message = "repositories[*].type must be one of: local, remote, virtual."
+  }
 }
 
 variable "global_security_policy_name" {
-  description = "Name of the platform baseline Xray security policy (created by platform/)"
+  description = "Platform baseline Xray security policy name. Set to empty string to skip (use when platform all-repos watch already covers baseline and you want to avoid duplicate violations)."
   type        = string
   default     = "policy-security-baseline"
 }

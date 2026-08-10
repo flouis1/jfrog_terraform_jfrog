@@ -17,9 +17,12 @@ resource "xray_watch" "project" {
     name = project.this.key
   }
 
-  assigned_policy {
-    name = var.global_security_policy_name
-    type = "security"
+  dynamic "assigned_policy" {
+    for_each = var.global_security_policy_name != "" ? [var.global_security_policy_name] : []
+    content {
+      name = assigned_policy.value
+      type = "security"
+    }
   }
 
   dynamic "assigned_policy" {

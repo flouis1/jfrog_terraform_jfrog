@@ -4,9 +4,9 @@ resource "project" "this" {
   description  = var.project_description
 
   admin_privileges {
-    index_resources   = true
-    manage_members    = true
-    manage_resources  = true
+    index_resources  = true
+    manage_members   = true
+    manage_resources = true
   }
 
   max_storage_in_gibibytes   = var.max_storage_in_gibibytes

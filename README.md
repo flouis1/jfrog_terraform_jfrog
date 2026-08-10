@@ -43,7 +43,16 @@ Both layers create watches on purpose:
 | `watch-security-baseline` | `platform/` | `all-repos` | Platform team |
 | `watch-<project_key>` | `teams/<team>/` | that JFrog Project (`project_key` + `watch_resource type=project`) | Project Admins (team) |
 
-The project watch attaches the platform baseline policy by name, and can optionally attach extra team policies via `team_security_policy_names`.
+The project watch can optionally attach **team-only** policies via `team_security_policy_names`.
+
+By default the project watch also attaches the platform baseline policy by name. If the platform `all-repos` watch already covers that baseline, attaching it again on every project watch can duplicate violations/alerts. Prefer one of:
+
+- **Platform covers baseline** — set project watches to team-only policies (`global_security_policy_name` unused / empty list of extras only), or
+- **Keep both** — accept duplicate baseline signals for defense in depth during a demo
+
+### Supported repository types
+
+The `team_project` module currently creates **docker** and **generic** repos only (`local` / `remote` / `virtual` where applicable). Maven, NuGet, npm, etc. are not implemented yet — the variable validates `package_type` and will fail plan if you pass an unsupported type.
 
 ## Quick start — platform (global)
 
@@ -62,7 +71,7 @@ Creates:
 - `policy-security-baseline` — block malicious, alert High/Critical
 - `watch-security-baseline` — applies that policy to **all repositories**
 - `audit-reports-local` — Generic archive for CSV exports (not Xray-indexed)
-- `audit-reports-cleanup-730d` — cleanup policy (create with `enabled = false`, flip to `true` after first apply)
+- `audit-reports-cleanup-730d` — cleanup policy (**created with `enabled = false`**; after first apply, set `enabled = true` in `platform/main.tf` and re-apply)
 
 ## Quick start — team
 
@@ -97,7 +106,7 @@ Each `teams/<team>/` folder is a **fully independent Terraform root module**. Te
 | Aspect | Isolation |
 |--------|-----------|
 | State | Each team has its own `.tfstate` — no shared locking |
-| Plan | Team 1 can have Docker repos, Team 2 can have Maven + NuGet |
+| Plan | Each team can declare a different repo layout in its own `main.tf` (today: docker + generic) |
 | Apply | Teams apply independently — one failure doesn't block others |
 | Review | Each team's changes go through their own PR / approval flow |
 | Schedule | Team 1 can deploy daily, Team 2 weekly — no coordination needed |
