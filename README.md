@@ -1,13 +1,14 @@
 # Terraform — JFrog Project per Team
 
-Demonstrates the **one project per team** pattern on JFrog Platform using Terraform.
-
-Each team has its own Terraform state — isolated blast radius, no cross-team locking conflicts.
+Demonstrates the **one project per team** pattern on JFrog Platform using Terraform, with a separate **platform** stack for global config that is not tied to any project.
 
 ## Repository structure
 
 ```
 .
+├── platform/                   # Global baseline (own state) — apply FIRST
+│   ├── main.tf                 # Global Xray policy + watch, audit archive
+│   └── ...
 ├── modules/
 │   └── team_project/           # Reusable module: project + repos + group assignments
 └── teams/
@@ -16,7 +17,43 @@ Each team has its own Terraform state — isolated blast radius, no cross-team l
     └── team2/                  # Team 2 — own state, own apply
 ```
 
-## Quick start
+## Two layers
+
+| Layer | Path | Owns | Does NOT own |
+|-------|------|------|--------------|
+| **Platform** | `platform/` | Global Xray baseline policy + all-repos watch, audit-reports archive + cleanup | Team repos, project membership, project-scoped watches |
+| **Team** | `teams/<team>/` | JFrog Project, team repos, group roles, team-specific config | Global security baseline |
+
+Apply order:
+
+```
+1. platform/     →  global security floor + audit archive
+2. teams/team1/  →  independent
+3. teams/team2/  →  independent
+```
+
+Teams can attach the global policy (`policy-security-baseline`) to their own watches, or rely on the platform all-repos watch. They must not recreate the baseline policy.
+
+## Quick start — platform (global)
+
+```bash
+cd platform
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars — set your JFrog Platform URL
+
+export JFROG_ACCESS_TOKEN="<your-admin-token>"
+terraform init
+terraform plan
+terraform apply
+```
+
+Creates:
+- `policy-security-baseline` — block malicious, alert High/Critical
+- `watch-security-baseline` — applies that policy to **all repositories**
+- `audit-reports-local` — Generic archive for CSV exports (not Xray-indexed)
+- `audit-reports-cleanup-730d` — cleanup policy (create with `enabled = false`, flip to `true` after first apply)
+
+## Quick start — team
 
 ```bash
 cd teams/team1
@@ -55,9 +92,10 @@ Each `teams/<team>/` folder is a **fully independent Terraform root module**. Te
 | Schedule | Team 1 can deploy daily, Team 2 weekly — no coordination needed |
 | Backend | Each team can store state in a different path/bucket |
 
-In CI, this means one pipeline per team folder:
+In CI, this means one pipeline per team folder (plus a separate platform pipeline):
 
 ```
+platform/     →  init → plan → PR review → apply    (platform team)
 teams/team1/  →  init → plan → PR review → apply    (independent)
 teams/team2/  →  init → plan → PR review → apply    (independent)
 ```
@@ -66,13 +104,13 @@ teams/team2/  →  init → plan → PR review → apply    (independent)
 
 This is a **reference demo**. Out of the box, state is local — fine for a solo lab, **not OK for team/CI**.
 
-Before any shared usage, edit `backend.tf` in each team folder: uncomment **one** backend and set real values (S3, GCS, or azurerm).
+Before any shared usage, edit `backend.tf` in each stack folder: uncomment **one** backend and set real values (S3, GCS, or azurerm).
 
 ```hcl
 terraform {
   backend "s3" {
     bucket         = "my-terraform-state"
-    key            = "jfrog-projects/team1/terraform.tfstate"   # unique per team
+    key            = "jfrog-projects/team1/terraform.tfstate"   # unique per stack
     region         = "eu-west-1"
     dynamodb_table = "terraform-locks"
     encrypt        = true
@@ -80,7 +118,7 @@ terraform {
 }
 ```
 
-Each team must keep a **unique** state path so states never collide.
+Each stack must keep a **unique** state path so states never collide.
 
 **Do not store this state inside the JFrog Platform this code manages.** This stack configures Artifactory repositories, Projects and Xray policies. Keeping its state on that same platform creates a circular dependency — a bad apply or a platform outage would lock you out of the state needed to fix it. Pick storage that stays available when the platform is down.
 
@@ -90,15 +128,17 @@ The legacy `backend "artifactory"` block is not an option either: it was depreca
 
 - Groups referenced in `admin_groups` / `member_groups` must already exist in Artifactory
 - The access token needs platform admin permissions
+- Apply `platform/` before relying on the global policy / watch
 
 ## Providers
 
-| Provider | Version | Purpose |
+| Provider | Version | Used by |
 |----------|---------|---------|
-| `jfrog/artifactory` | `~> 12.11` | Repository management |
-| `jfrog/project` | `~> 1.9` | Project, group, and repository assignment |
+| `jfrog/artifactory` | `~> 12.11` | platform + teams |
+| `jfrog/project` | `~> 1.9` | teams |
+| `jfrog/xray` | `~> 3.1` | platform |
 
 ## Requirements
 
 - Terraform >= 1.5
-- JFrog Platform with Projects enabled
+- JFrog Platform with Projects and Xray enabled
