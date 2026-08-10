@@ -5,3 +5,7 @@ provider "artifactory" {
 provider "project" {
   url = var.jfrog_url
 }
+
+provider "xray" {
+  url = "${var.jfrog_url}/xray"
+}

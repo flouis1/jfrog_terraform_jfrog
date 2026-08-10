@@ -21,8 +21,8 @@ Demonstrates the **one project per team** pattern on JFrog Platform using Terraf
 
 | Layer | Path | Owns | Does NOT own |
 |-------|------|------|--------------|
-| **Platform** | `platform/` | Global Xray baseline policy + all-repos watch, audit-reports archive + cleanup | Team repos, project membership, project-scoped watches |
-| **Team** | `teams/<team>/` | JFrog Project, team repos, group roles, team-specific config | Global security baseline |
+| **Platform** | `platform/` | Global Xray baseline policy + **all-repos watch**, audit-reports archive + cleanup | Team repos, project membership, project-scoped watches |
+| **Team** | `teams/<team>/` | JFrog Project, team repos, group roles, **project-scoped watch** | Global security baseline policy |
 
 Apply order:
 
@@ -33,6 +33,17 @@ Apply order:
 ```
 
 Teams can attach the global policy (`policy-security-baseline`) to their own watches, or rely on the platform all-repos watch. They must not recreate the baseline policy.
+
+### Watches: global + per project
+
+Both layers create watches on purpose:
+
+| Watch | Where | Scope | Who manages it |
+|-------|-------|-------|----------------|
+| `watch-security-baseline` | `platform/` | `all-repos` | Platform team |
+| `watch-<project_key>` | `teams/<team>/` | that JFrog Project (`project_key` + `watch_resource type=project`) | Project Admins (team) |
+
+The project watch attaches the platform baseline policy by name, and can optionally attach extra team policies via `team_security_policy_names`.
 
 ## Quick start — platform (global)
 
@@ -136,7 +147,7 @@ The legacy `backend "artifactory"` block is not an option either: it was depreca
 |----------|---------|---------|
 | `jfrog/artifactory` | `~> 12.11` | platform + teams |
 | `jfrog/project` | `~> 1.9` | teams |
-| `jfrog/xray` | `~> 3.1` | platform |
+| `jfrog/xray` | `~> 3.1` | platform + teams |
 
 ## Requirements
 

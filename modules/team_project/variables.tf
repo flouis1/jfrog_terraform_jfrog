@@ -51,3 +51,15 @@ variable "repositories" {
   }))
   default = []
 }
+
+variable "global_security_policy_name" {
+  description = "Name of the platform baseline Xray security policy (created by platform/)"
+  type        = string
+  default     = "policy-security-baseline"
+}
+
+variable "team_security_policy_names" {
+  description = "Optional extra Xray security policies owned by this team (must already exist)"
+  type        = list(string)
+  default     = []
+}

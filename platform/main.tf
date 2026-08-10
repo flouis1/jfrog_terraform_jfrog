@@ -53,8 +53,9 @@ resource "xray_security_policy" "baseline" {
 ################################################################################
 # Global watch — applies the baseline policy across all repositories
 #
-# Teams may add project-scoped watches for extra rules. This watch is the
-# enterprise floor that every artifact must pass.
+# Coexists with project-scoped watches in teams/* :
+#   - platform watch  = enterprise floor (all-repos)
+#   - team watch      = project-owned (project_key), managed by Project Admins
 ################################################################################
 
 resource "xray_watch" "baseline" {

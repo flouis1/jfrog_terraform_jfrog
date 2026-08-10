@@ -10,5 +10,9 @@ terraform {
       source  = "jfrog/project"
       version = "~> 1.9"
     }
+    xray = {
+      source  = "jfrog/xray"
+      version = "~> 3.1"
+    }
   }
 }

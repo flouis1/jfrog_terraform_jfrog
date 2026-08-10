@@ -8,6 +8,9 @@ module "team_project" {
   team_admin_groups  = ["team1-leads"]
   team_member_groups = ["team1-devs"]
 
+  # Attach platform baseline; add team-only policies via team_security_policy_names
+  global_security_policy_name = "policy-security-baseline"
+
   repositories = [
     {
       key          = "team1-docker-dev-local"
