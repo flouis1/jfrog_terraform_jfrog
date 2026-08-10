@@ -1,19 +1,55 @@
-# Terraform multi-stack example
+# Terraform — JFrog Project per Team
 
-The aim of this project is to demonstrate how to create the same set of resources on multiple JFrog Platform Deployment using terraform.
+Demonstrates the **one project per team** pattern on JFrog Platform using Terraform.
 
-In this example, commons resources have been declared in a terraform module. Terraform module allows to encapsulate complexity in one place and ease it utilization across multiple stacks
+Each team gets an isolated JFrog Project containing its own repositories, with group-based permissions scoped to that project.
 
-Once terraform stack have been created for each JPD. They all reference the module to deploy common resources.
-![schema](./assets/schema.png)
+## Repository structure
 
-## Usage
+```
+.
+├── modules/
+│   └── team_project/       # Reusable module: creates a project + repos + group assignments
+└── teams/
+    └── sample-team/        # Example: one team stack targeting psemea.jfrog.io
+```
 
-To deploy resources, check the **README.md** in each repository
+## Quick start
 
-## Potential improvements
+```bash
+cd teams/sample-team
+export JFROG_ACCESS_TOKEN="<your-token>"
+terraform init
+terraform plan
+terraform apply
+```
 
-In order to improve this project and make it production ready, you can do the followings tasks:
+## How it works
 
-- Update the backend configuration to rely on a more suitable solution (S3, GCS, etc...)
-- Host the terraform module on Git to ease the deployment (Github, Gitlab, etc..)
+1. The `team_project` module creates a JFrog **Project** with admin privileges.
+2. Repositories are created and assigned to the project via `project_repository`.
+3. Groups are assigned roles within the project (`Project Admin` or `Developer`).
+4. Each team stack is independent — its own state, its own variables.
+
+## Adding a new team
+
+1. Copy `teams/sample-team/` to `teams/<new-team>/`.
+2. Edit `main.tf` — set the project key, display name, repos, and groups.
+3. Run `terraform init && terraform apply`.
+
+## Providers
+
+| Provider | Version | Purpose |
+|----------|---------|---------|
+| `jfrog/artifactory` | `~> 12.11` | Repository management |
+| `jfrog/project` | `~> 1.9` | Project, group, and repository assignment |
+
+## Authentication
+
+Set the `JFROG_ACCESS_TOKEN` environment variable. The token needs platform admin permissions to create projects and repositories.
+
+## Requirements
+
+- Terraform >= 1.5
+- JFrog Platform with Projects enabled
+- Access token with admin privileges

@@ -1,1 +1,0 @@
-jfrog_url = "https://psemea2.jfrog.io/"
