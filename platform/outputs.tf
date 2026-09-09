@@ -18,3 +18,9 @@ output "scim_admin_token" {
   value       = artifactory_scoped_token.scim_admin_token.access_token
   sensitive   = true
 }
+
+output "ci_user_token" {
+  description = "CI user token to be consumed by CI tools"
+  value       = artifactory_scoped_token.ci-user-token.access_token
+  sensitive   = true
+}

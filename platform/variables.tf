@@ -22,3 +22,13 @@ variable "JFROG_ACCESS_TOKEN" {
   description = "JFrog access token with admistrative permissions."
   type        = string
 }
+
+variable "ci_user_name" {
+  description = "Name for the service account."
+  type        = string
+}
+
+variable "ci_user_email" {
+  description = "Email for the service account. For example, the platform team's distribution list."
+  type        = string
+}

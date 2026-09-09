@@ -137,3 +137,20 @@ resource "artifactory_scoped_token" "scim_admin_token" {
   description = "SCIM admin token for use with Entra ID"
   scopes = ["system:identities:r,w,d"]
 }
+
+################################################################################
+# Create a service account for use with CI tools
+################################################################################
+
+resource "artifactory_user" "my-ci-user" {
+  name = var.ci_user_name
+  email = var.ci_user_email
+  disable_ui_access = true
+}
+
+resource "artifactory_scoped_token" "ci-user-token" {
+  username = var.ci_user_name
+  expires_in = 0 // in seconds. 0 = Never expires
+  description = "CI user token for use with CI tools"
+  scopes = ["applied-permissions/user"]
+}
