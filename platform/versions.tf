@@ -6,6 +6,10 @@ terraform {
       source  = "jfrog/artifactory"
       version = "~> 12.11"
     }
+    platform = {
+      source  = "jfrog/platform"
+      version = "~> 2.2"
+    }
     xray = {
       source  = "jfrog/xray"
       version = "~> 3.1"

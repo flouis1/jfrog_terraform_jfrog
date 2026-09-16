@@ -1,1 +1,4 @@
 jfrog_url = "https://your-instance.jfrog.io"
+entraid_certificate = "MIICTjCCA...gPRXbm49Mz4o1nbwH"
+entraid_login_url = "https://login.microsoftonline.com/<guid>/saml2"
+entraid_logout_url = "https://login.microsoftonline.com/<guid>/saml2"
