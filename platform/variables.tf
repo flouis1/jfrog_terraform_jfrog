@@ -17,3 +17,8 @@ variable "entraid_logout_url" {
   description = "SAML identity provider logout URL."
   type        = string
 }
+
+variable "JFROG_ACCESS_TOKEN" {
+  description = "JFrog access token with admistrative permissions."
+  type        = string
+}

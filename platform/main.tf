@@ -130,3 +130,10 @@ resource "platform_saml_settings" "entraid-saml-settings" {
   verify_audience_restriction  = true
   use_encrypted_assertion      = false
 }
+
+resource "artifactory_scoped_token" "scim_admin_token" {
+  username   = "scim_admin"
+  expires_in = 0 // in seconds. 0 = Never expires
+  description = "SCIM admin token for use with Entra ID"
+  scopes = ["system:identities:r,w,d"]
+}

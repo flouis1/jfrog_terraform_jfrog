@@ -12,3 +12,9 @@ output "audit_reports_repo" {
   description = "Generic repo for archived Xray report CSVs"
   value       = artifactory_local_generic_repository.audit_reports.key
 }
+
+output "scim_admin_token" {
+  description = "SCIM admin token to be consumed by Entra ID"
+  value       = artifactory_scoped_token.scim_admin_token.access_token
+  sensitive   = true
+}
