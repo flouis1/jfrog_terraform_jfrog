@@ -12,3 +12,9 @@ output "audit_reports_repo" {
   description = "Generic repo for archived Xray report CSVs"
   value       = artifactory_local_generic_repository.audit_reports.key
 }
+
+output "ci_user_token" {
+  description = "CI user token to be consumed by CI tools"
+  value       = artifactory_scoped_token.ci-user-token.access_token
+  sensitive   = true
+}
