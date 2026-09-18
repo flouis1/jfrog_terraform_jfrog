@@ -13,12 +13,6 @@ output "audit_reports_repo" {
   value       = artifactory_local_generic_repository.audit_reports.key
 }
 
-output "scim_admin_token" {
-  description = "SCIM admin token to be consumed by Entra ID"
-  value       = artifactory_scoped_token.scim_admin_token.access_token
-  sensitive   = true
-}
-
 output "ci_user_token" {
   description = "CI user token to be consumed by CI tools"
   value       = artifactory_scoped_token.ci-user-token.access_token
