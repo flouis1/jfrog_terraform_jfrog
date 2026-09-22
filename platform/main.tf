@@ -105,20 +105,3 @@ resource "artifactory_package_cleanup_policy" "audit_reports_retention" {
     created_before_in_days = 730
   }
 }
-
-################################################################################
-# Create a service account for use with CI tools
-################################################################################
-
-resource "artifactory_user" "my_ci_user" {
-  name = var.ci_user_name
-  email = var.ci_user_email
-  disable_ui_access = true
-}
-
-resource "artifactory_scoped_token" "ci_user_token" {
-  username = var.ci_user_name
-  expires_in = 0 // in seconds. 0 = Never expires
-  description = "CI user token for use with CI tools"
-  scopes = ["applied-permissions/user"]
-}
