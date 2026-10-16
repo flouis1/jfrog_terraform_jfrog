@@ -1,0 +1,5 @@
+saml_certificate_path = "/path/to/my/entraid.cer" # b64 encoded entraid certificate
+saml_login_url = "https://login.microsoftonline.com/<guid>/saml2"
+saml_logout_url = "https://login.microsoftonline.com/<guid>/saml2"
+saml_settings_name = "entraid"
+saml_service_provider_entity_id = "https://your-instance.jfrog.io"
