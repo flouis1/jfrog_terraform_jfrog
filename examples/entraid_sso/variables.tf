@@ -1,3 +1,8 @@
+variable "jfrog_url" {
+  description = "JFrog Platform URL (e.g. https://myinstance.jfrog.io)"
+  type        = string
+}
+
 variable "saml_certificate_path" {
   description = "Path to the SAML identity provider X.509 certificate. This can be downloaded from Azure."
   type        = string

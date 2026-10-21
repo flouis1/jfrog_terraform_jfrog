@@ -1,3 +1,4 @@
+jfrog_url = "https://your-instance.jfrog.io"
 saml_certificate_path = "/path/to/my/entraid.cer" # b64 encoded entraid certificate
 saml_login_url = "https://login.microsoftonline.com/<guid>/saml2"
 saml_logout_url = "https://login.microsoftonline.com/<guid>/saml2"
